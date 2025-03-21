@@ -3,10 +3,10 @@ import axios from "axios";
 import { PayPalButton } from "react-paypal-button-v2";
 import { Row, Col, ListGroup, Image, Card, Button } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
+import { Link, useParams, useNavigate } from "react-router-dom"; // Use useParams and useNavigate
 
 import Message from "../components/Message";
 import Loader from "../components/Loader";
-import { Link } from "react-router-dom";
 import {
   getOrderDetails,
   payOrder,
@@ -17,9 +17,9 @@ import {
   ORDER_DELIVER_RESET,
 } from "../constants/orderConstants";
 
-const OrderScreen = ({ match, history }) => {
-  const orderId = match.params.id;
-
+const OrderScreen = () => {
+  const { id: orderId } = useParams(); // Use useParams to get the order ID
+  const navigate = useNavigate(); // Replace history with useNavigate
   const [sdkReady, setSdkReady] = useState(false);
 
   const dispatch = useDispatch();
@@ -36,21 +36,11 @@ const OrderScreen = ({ match, history }) => {
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
 
-  if (!loading) {
-    // Calculate prices
-    const addDecimals = (num) => {
-      return (Math.round(num * 100) / 100).toFixed(2);
-    };
-
-    order.itemsPrice = addDecimals(
-      order.orderItems.reduce((acc, item) => acc + item.price * item.qty, 0)
-    );
-  }
-
   useEffect(() => {
     if (!userInfo) {
-      history.push("/login");
+      navigate("/login"); // Use navigate instead of history.push
     }
+
     const addPayPalScript = async () => {
       const { data: clientId } = await axios.get("/api/config/paypal");
       const script = document.createElement("script");
@@ -74,7 +64,15 @@ const OrderScreen = ({ match, history }) => {
         setSdkReady(true);
       }
     }
-  }, [dispatch, order, successPay, orderId, successDeliver, history, userInfo]);
+  }, [
+    dispatch,
+    order,
+    successPay,
+    orderId,
+    successDeliver,
+    navigate,
+    userInfo,
+  ]);
 
   const successPaymentHandler = (paymentResult) => {
     dispatch(payOrder(orderId, paymentResult));
@@ -83,6 +81,17 @@ const OrderScreen = ({ match, history }) => {
   const deliverHandler = () => {
     dispatch(deliverOrder(order));
   };
+
+  // Calculate prices dynamically
+  const addDecimals = (num) => {
+    return (Math.round(num * 100) / 100).toFixed(2);
+  };
+
+  const itemsPrice = order
+    ? addDecimals(
+        order.orderItems.reduce((acc, item) => acc + item.price * item.qty, 0)
+      )
+    : 0;
 
   return loading ? (
     <Loader />
@@ -173,7 +182,8 @@ const OrderScreen = ({ match, history }) => {
               <ListGroup.Item>
                 <Row>
                   <Col>Items</Col>
-                  <Col>${order.itemsPrice}</Col>
+                  <Col>${itemsPrice}</Col>{" "}
+                  {/* Use dynamically calculated price */}
                 </Row>
               </ListGroup.Item>
 

@@ -1,27 +1,30 @@
 import React, { useState } from "react";
 import { Form, Button, Col } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom"; // Replace history with useNavigate
 
 import FormContainer from "../components/FormContainer";
 import CheckoutSteps from "../components/CheckoutSteps";
 import { savePaymentMethod } from "../actions/cartActions";
 
-const PaymentScreen = ({ history }) => {
+const PaymentScreen = () => {
+  const navigate = useNavigate(); // Use useNavigate instead of history
+  const dispatch = useDispatch();
+
   const cart = useSelector((state) => state.cart);
   const { shippingAddress } = cart;
 
+  // Redirect if shipping address is missing
   if (!shippingAddress) {
-    history.push("/shipping");
+    navigate("/shipping");
   }
 
-  const [paymentMethod, setpaymentMethod] = useState("PayPal");
-
-  const dispatch = useDispatch();
+  const [paymentMethod, setPaymentMethod] = useState("PayPal"); // Corrected state variable name
 
   const submitHandler = (e) => {
     e.preventDefault();
     dispatch(savePaymentMethod(paymentMethod));
-    history.push("/placeorder");
+    navigate("/placeorder"); // Use navigate instead of history.push
   };
 
   return (
@@ -31,27 +34,28 @@ const PaymentScreen = ({ history }) => {
       <Form onSubmit={submitHandler}>
         <Form.Group>
           <Form.Label as="legend">Select Method</Form.Label>
-
           <Col>
             <Form.Check
               type="radio"
               label="PayPal or Credit Card"
               id="PayPal"
               name="paymentMethod"
-              value="PayPay"
-              checked
-              onChange={(e) => setpaymentMethod(e.targe.value)}
+              value="PayPal" // Corrected value
+              checked={paymentMethod === "PayPal"} // Dynamically checked
+              onChange={(e) => setPaymentMethod(e.target.value)} // Fixed typo
             ></Form.Check>
 
-            {/* <Form.Check
-            type="radio"
-            label="Stripe"
-            id="Stripe"
-            name="paymentMethod"
-            value="Stripe"
-            checked
-            onChange={(e) => setpaymentMethod(e.targe.value)}
-          ></Form.Check> */}
+            {/* Uncomment to add a second payment method
+            <Form.Check
+              type="radio"
+              label="Stripe"
+              id="Stripe"
+              name="paymentMethod"
+              value="Stripe"
+              checked={paymentMethod === "Stripe"}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+            ></Form.Check>
+            */}
           </Col>
         </Form.Group>
 

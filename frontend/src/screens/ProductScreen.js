@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom"; // Replace useHistory with useNavigate
+import { Link, useNavigate, useParams } from "react-router-dom"; // Import useParams
 import {
   Row,
   Col,
@@ -22,13 +22,14 @@ import Loader from "../components/Loader";
 import Message from "../components/Message";
 import Meta from "../components/Meta";
 
-const ProductScreen = ({ match }) => {
+const ProductScreen = () => {
   const [qty, setQty] = useState(1);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
 
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Replace useHistory with useNavigate
+  const navigate = useNavigate();
+  const params = useParams(); // Use useParams to get route parameters
 
   const productDetails = useSelector((state) => state.productDetails);
   const { loading, error, product } = productDetails;
@@ -47,17 +48,18 @@ const ProductScreen = ({ match }) => {
       setComment("");
       dispatch({ type: PRODUCT_CREATE_REVIEW_RESET });
     }
-    dispatch(listProductDetails(match.params.id));
-  }, [dispatch, match, successProductReview]);
+    dispatch(listProductDetails(params.id)); // Use params.id instead of match.params.id
+  }, [dispatch, params, successProductReview]); // Add params to the dependency array
 
   const addToCartHandler = () => {
-    navigate(`/cart/${match.params.id}?qty=${qty}`); // Replace history.push with navigate
+    navigate(`/cart/${params.id}?qty=${qty}`); // Use params.id instead of match.params.id
   };
 
   const submitHandler = (e) => {
     e.preventDefault();
     dispatch(
-      createProductReview(match.params.id, {
+      createProductReview(params.id, {
+        // Use params.id instead of match.params.id
         rating,
         comment,
       })
