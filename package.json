@@ -1,0 +1,39 @@
+{
+  "name": "proshop",
+  "version": "1.0.0",
+  "description": "MERN shopping cart app",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node backend/server",
+    "server": "node backend/server",
+    "client": "npm start --prefix frontend",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "data:import": "node backend/seeder",
+    "data:destroy": "node backend/seeder -d",
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix frontend && npm run build --prefix frontend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mariosknl/ProShop.git"
+  },
+  "author": "Marios Kanellopoulos",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mariosknl/ProShop/issues"
+  },
+  "homepage": "https://github.com/mariosknl/ProShop#readme",
+  "dependencies": {
+    "axios": "^1.0.0",
+    "bcryptjs": "^3.0.0",
+    "colors": "^1.4.0",
+    "dotenv": "^16.0.0",
+    "express": "^4.17.1",
+    "express-async-handler": "^1.1.4",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^8.0.0",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.2",
+    "redux-devtools-extension": "^2.13.9"
+  }
+}
